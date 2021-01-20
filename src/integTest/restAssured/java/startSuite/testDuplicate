@@ -1,0 +1,22 @@
+package startSuite;
+
+import Utils.LocalTestConfig;
+import Utils.TEmulatorUtils;
+import io.qameta.allure.junit4.DisplayName;
+import org.junit.Test;
+
+
+
+
+@DisplayName("Monitoring of different class types")
+public class AllClassesTypes1 extends LocalTestConfig {
+
+    @DisplayName("Operate All classes in dummy Application")
+    @Test
+    public void allLibrariesExists1() throws InterruptedException {
+
+        Thread.sleep(1600);
+        TEmulatorUtils.executeAllOperations();
+        Thread.sleep(1600);
+    }
+}

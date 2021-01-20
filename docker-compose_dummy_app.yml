@@ -1,0 +1,8 @@
+version: '3'
+services:
+  dummy_app:
+    image: cdd_dummy_app:latest
+    ports:
+    - "8083:8080"
+    volumes:
+    - /home/cdd/.cdd/:/home/cdd/.cdd

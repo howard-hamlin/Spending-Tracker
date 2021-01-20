@@ -1,0 +1,92 @@
+configurations {
+    robotTest
+    robotCompile
+}
+
+dependencies {
+    robotTest "org.robotframework:robotframework:2.9.2"
+    robotCompile group: 'org.robotframework', name: 'javalib-core', version: '1.0.1'
+    robotCompile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0'
+    robotCompile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.29'
+    robotCompile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.29'
+}
+
+sourceSets {
+    robot {
+        java.srcDirs = [ 'src/integTest/robot/java' ]
+        resources.srcDirs = [ 'src/integTest/robot/resources' ]
+    }
+}
+
+class RobotTask extends org.gradle.api.tasks.JavaExec {
+    private boolean configured = false;
+
+    @Override
+    Task configure(Closure closure) {
+        super.configure closure
+        if (this.configured) {
+            return
+        }
+        this.configured = true
+        dependsOn 'robotClasses'
+        classpath (project.configurations.robotTest + project.sourceSets.robot.runtimeClasspath)
+        args (getBaseArguments() + "src/integTest/robot/tests")
+        main 'org.robotframework.RobotFramework'
+    }
+
+    Iterable getBaseArguments() {
+        def baseProperties =  new HashMap()
+        def resultArgs = new LinkedList<String>()
+        //Go over the user input for gradle. Anything that starts with robot. interests us
+        project.properties.each {k ,v ->
+            if (k.startsWith("robot.")) {
+                println "${k}:${v}"
+                if (k.equalsIgnoreCase("robot.test")) {
+                    resultArgs.add("-t")
+                    resultArgs.add(v)
+                } else if (k.equalsIgnoreCase("robot.suite")) {
+                    resultArgs.add("-s")
+                    resultArgs.add(v)
+                } else if (k.equalsIgnoreCase("robot.include")) {
+                    resultArgs.add("-i")
+                    resultArgs.add(v)
+                } else if (k.equalsIgnoreCase("robot.exclude")) {
+                    resultArgs.add("-e")
+                    resultArgs.add(v)
+                } else {
+                    baseProperties.put(k.substring(6),v)
+                }
+            }
+        }
+
+        def projectDir = project.projectDir
+        def baseDirArr = [projectDir, "src", "integTest", "robot"]
+        def librariesDir = (baseDirArr + "common").join(File.separator)
+        def resourcesDir = (baseDirArr + "resources").join(File.separator)
+        def logDir = [project.buildDir, "robot"].join(File.separator)
+        def binDir = [projectDir, "bin"].join(File.separator)
+        baseProperties.put("LIBRARIES", librariesDir)
+        baseProperties.put("LOGDIR", logDir)
+        baseProperties.put("BIN_DIR", binDir)
+        baseProperties.put("PROJECT_BASE_DIR", "${project.projectDir}")
+        baseProperties.put("RESOURCES", resourcesDir)
+        baseProperties.each{ k, v ->
+            resultArgs.add("-v")
+            resultArgs.add("${k}:${v}")
+        }
+
+        resultArgs.add("--outputdir")
+        resultArgs.add("${logDir}")
+        resultArgs.add("-b")
+        resultArgs.add("${logDir}/robot.debug.log")
+        resultArgs.add("-x")
+        resultArgs.add("${logDir}/robot_xunit.xml")
+        return resultArgs
+    }
+}
+
+task runRobotTests(type: RobotTask) {
+    doFirst {
+        println args
+    }
+}
