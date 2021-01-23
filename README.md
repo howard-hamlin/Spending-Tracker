@@ -1,4 +1,4 @@
-# NatWest-Online-Payments
+# NatWest-Spending-Tracker
 
 An application to be used for testing other apps.  
 Initially used to test tar-agent.  
