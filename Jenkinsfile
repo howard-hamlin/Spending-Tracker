@@ -19,7 +19,7 @@ pipeline {
  }
  post {
   success {
-    sendNotificationToCDDCall projectName: 'NatWest', scope: 'BUSINESS_APPLICATION', businessApplicationName: 'ClearSpend'
+    sendNotificationToCDDCall projectName: 'Demo', scope: 'BUSINESS_APPLICATION', businessApplicationName: 'ClearSpend'
   }
  }
 }
