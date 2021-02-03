@@ -1,7 +1,7 @@
 # Spending-Tracker 
 
 An application to be used for testing other apps.    
-Initially used to test tar-agent.   
+Initially used to test tar-agent.    
 
 ### In order to run a dummy-app with a java agent that monitors the dummy app, follow steps below:
 **1.**  make sure docker is installed on host. you may type the command below and get a list of running containers.  
